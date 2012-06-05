@@ -15,6 +15,8 @@ alias ssh='TERM=${TERM%-256color} ssh'
 alias diff='colordiff'        
 alias grep='grep --color=auto'
 alias ..='cd ..'
+alias pacman='pacman-color'
+alias pacs="pacman -Ss"
 
 aur() {
   package=$1
@@ -23,14 +25,6 @@ aur() {
   if [ 0 -ne "$?" ]; then
     echo "Failed to fetch package $package!"
   fi 
-}
-
-pacs() {
-  echo -e "$(pacman -Ss $@ | sed \
-  -e 's#core/.*#\\033[1;31m&\\033[0;37m#g' \
-  -e 's#extra/.*#\\033[0;32m&\\033[0;37m#g' \
-  -e 's#community/.*#\\033[1;35m&\\033[0;37m#g' \
-  -e 's#^.*/.* [0-9].*#\\033[0;36m&\\033[0;37m#g' )"
 }
 
 man() {
@@ -49,3 +43,6 @@ if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
   exec startx
 fi
 
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+[[ -s "/home/nanda/.rvm/scripts/rvm" ]] && source "/home/nanda/.rvm/scripts/rvm"
