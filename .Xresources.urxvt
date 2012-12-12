@@ -4,6 +4,9 @@ URxvt*letterSpace: -1
 URxvt.scrollstyle: rxvt
 
 URxvt.font: xft:monaco:size=10
+!URxvt.font:xft:Tamsyn:autohint=true:pixelsize=20
+!URxvt.boldFont:xft:Tamsyn:autohint=true:pixelsize=20
+
 URxvt*termName:screen-256color
 
 ! Extensions

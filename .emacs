@@ -1,5 +1,5 @@
 
-(set-default-font "Monaco-10")
+;(set-default-font "Monaco-10")
 (set-face-attribute 'default nil :height 100)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -9,6 +9,7 @@
 (global-set-key "\C-h" 'backward-delete-char)
 (global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\C-c\C-k" 'kill-region)
+(global-set-key "\C-l" 'goto-line)
 (global-set-key [f1] 'help)
 
 (custom-set-variables
@@ -25,17 +26,11 @@
  '(mouse-wheel-mode t)
  '(inhibit-startup-screen t)
  '(inhibit-startup-message t)
- '(fill-column 79))
+ '(fill-column 79)
+ '(make-backup-files nil))
 
 (show-paren-mode)
 
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
-  (package-initialize))
-
-
 (add-to-list 'load-path "~/.emacs.d")
-(require 'color-theme)
-(eval-after-load "color-theme"
-  '(color-theme-zenburn))
+
+

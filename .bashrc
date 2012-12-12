@@ -8,9 +8,6 @@
 alias ls='ls --color=auto'
 PS1='[\u@\h \W]\$ '
 
-PATH=$PATH:$HOME/.cabal/bin
-PATH=/usr/share/perl5/vendor_perl/auto/share/dist/Cope:$PATH
-
 alias ssh='TERM=${TERM%-256color} ssh'
 alias diff='colordiff'        
 alias grep='grep --color=auto'
@@ -39,10 +36,15 @@ man() {
 			man "$@"
 }
 
+export LESSOPEN="| /usr/bin/source-highlight-esc.sh %s"
+export LESS=' -R '
+
+PATH=$HOME/.opt/bin:/opt/android-sdk/tools:/opt/android-sdk/platform-tools:$PATH
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+[[ -s "/home/nanda/.rvm/scripts/rvm" ]] && source "/home/nanda/.rvm/scripts/rvm"
+
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
   exec startx
 fi
 
-
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-[[ -s "/home/nanda/.rvm/scripts/rvm" ]] && source "/home/nanda/.rvm/scripts/rvm"

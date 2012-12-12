@@ -4,8 +4,9 @@ xsetroot -cursor_name left_ptr &
 
 xset b off &
 xmodmap ~/.Xmodmap &
+xbindkeys &
 
 xset +fp /usr/share/fonts/local &
 xset fp rehash &
 
-exec ck-launch-session dbus-launch ~/.xstart
+~/.xstart

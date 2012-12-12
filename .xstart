@@ -1,4 +1,5 @@
 urxvtd &
 dunst &
-emacs --daemon &
-xmonad
+$HOME/.install/dwmstatus-1.1/dwmstatus &
+/usr/bin/emacs --daemon &
+exec dwm
