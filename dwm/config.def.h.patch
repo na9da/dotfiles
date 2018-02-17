@@ -1,5 +1,17 @@
 --- dwm-6.1/config.def.h	2015-11-09 09:39:37.000000000 +1100
-+++ dwm-6.1-patched/config.def.h	2018-02-17 11:44:13.883448083 +1100
++++ dwm-6.1-patched/config.def.h	2018-02-17 14:27:51.378216705 +1100
+@@ -2,9 +2,9 @@
+ 
+ /* appearance */
+ static const char *fonts[] = {
+-	"monospace:size=10"
++	"Ubuntu Mono:size=12"
+ };
+-static const char dmenufont[]       = "monospace:size=10";
++static const char dmenufont[]       = "Ubuntu Mono:size=16";
+ static const char normbordercolor[] = "#444444";
+ static const char normbgcolor[]     = "#222222";
+ static const char normfgcolor[]     = "#bbbbbb";
 @@ -42,7 +42,7 @@
  };
  
@@ -9,11 +21,13 @@
  #define TAGKEYS(KEY,TAG) \
  	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
  	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-@@ -55,7 +55,7 @@
+@@ -54,8 +54,8 @@
+ 
  /* commands */
  static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
- static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
+-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 -static const char *termcmd[]  = { "st", NULL };
++static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-i", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 +static const char *termcmd[]  = { "alacritty", "--command", "tmux", NULL };
  
  static Key keys[] = {

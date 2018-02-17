@@ -34,6 +34,7 @@
   time.timeZone = "Australia/Melbourne";
 
   powerManagement.enable = true;
+  powerManagement.cpuFreqGovernor = "powersave";
 
   nixpkgs.config.allowUnfree = true;
 
@@ -79,7 +80,15 @@
 
   security.wrappers.slock = { source="${pkgs.slock}/bin/slock"; };
 
+  services.acpid.enable = true;  
   services.ntp.enable = true;
+  services.redshift = {
+    enable = true;
+    provider = "geoclue2";
+    brightness.day = "0.8";
+    brightness.night = "0.4";
+  };
+
   services.xserver = {
     enable = true;
     startDbusSession = true;
@@ -87,11 +96,14 @@
     displayManager = {
       lightdm.enable = true;
       sessionCommands = ''
-        ${pkgs.xlibs.xset}/bin/xset r rate 200 30
-        ${pkgs.xlibs.xsetroot}/bin/xsetroot -cursor_name left_ptr
+        xsetroot -cursor_name left_ptr
+        xset r rate 200 30
       '';
     };
+
     desktopManager.default = "none";
+    desktopManager.wallpaper.mode = "fill";
+
     windowManager = {
       default = "dwm";
       dwm.enable = true;
@@ -128,9 +140,9 @@
   };
 
   fonts = {
-    enableCoreFonts = false;
+    enableCoreFonts = true;
     enableFontDir = true;
-    fontconfig.dpi = 192;
+    fontconfig.dpi = 220;
 
     fonts = with pkgs; [
       ubuntu_font_family
