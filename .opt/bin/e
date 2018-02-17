@@ -1,9 +1,0 @@
-current_active_window=`wmctrl -a :ACTIVE: -v 2>&1 | awk '/Using window/ { print $NF }'`
-
-#Switch to emacs window
-wmctrl -xa emacs 
-
-/usr/bin/emacsclient -a "" "$@"
-
-#Switch back to current window
-wmctrl -ia $current_active_window 

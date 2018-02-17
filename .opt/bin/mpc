@@ -1,1 +1,0 @@
-BUNDLE_GEMFILE=/home/nanda/work/infrastructure/project-creator/Gemfile rvm 1.9.3-p194 do bundle exec ruby -I/home/nanda/work/infrastructure/project-creator/lib /home/nanda/work/infrastructure/project-creator/bin/mpc $*
