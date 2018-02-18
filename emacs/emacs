@@ -34,7 +34,7 @@
  '(make-backup-files nil)
  '(menu-bar-mode nil)
  '(mouse-wheel-mode t)
- '(package-selected-packages (quote (yaml-mode)))
+ '(package-selected-packages (quote (markdown-mode rust-mode yaml-mode)))
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil))
 
