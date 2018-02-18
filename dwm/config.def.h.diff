@@ -1,5 +1,5 @@
 --- dwm-6.1/config.def.h	2015-11-09 09:39:37.000000000 +1100
-+++ dwm-6.1-patched/config.def.h	2018-02-17 14:27:51.378216705 +1100
++++ dwm-6.1-patched/config.def.h	2018-02-18 15:23:51.543587745 +1100
 @@ -2,9 +2,9 @@
  
  /* appearance */
@@ -12,7 +12,25 @@
  static const char normbordercolor[] = "#444444";
  static const char normbgcolor[]     = "#222222";
  static const char normfgcolor[]     = "#bbbbbb";
-@@ -42,7 +42,7 @@
+@@ -16,6 +16,17 @@
+ static const int showbar            = 1;        /* 0 means no bar */
+ static const int topbar             = 1;        /* 0 means bottom bar */
+ 
++/* colors for status bar */
++#define NUMCOLORS         4
++static const char colors[NUMCOLORS][MAXCOLORS][8] = {
++  // border   foreground background
++  { "#444444", "#bbbbbb", "#222222" },  // normal
++  { "#005577", "#eeeeee", "#005577" },  // selected
++  { "#ff0000", "#000000", "#ffff00" },  // urgent/warning  (black on yellow)
++  { "#ff0000", "#ffffff", "#ff0000" },  // error (white on red)
++  // add more here
++};
++
+ /* tagging */
+ static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+ 
+@@ -42,7 +53,7 @@
  };
  
  /* key definitions */
@@ -21,7 +39,7 @@
  #define TAGKEYS(KEY,TAG) \
  	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
  	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-@@ -54,8 +54,8 @@
+@@ -54,8 +65,8 @@
  
  /* commands */
  static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */

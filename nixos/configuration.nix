@@ -74,7 +74,8 @@
   nixpkgs.config.dwm = {
     name = "dwm-6.1";
     patches = [
-       /home/nanda/code/dotfiles/dwm/config.def.h.patch
+       /home/nanda/code/dotfiles/dwm/config.def.h.diff
+       /home/nanda/code/dotfiles/dwm/dwm-statuscolors-6.1.diff
     ];
   };
 
@@ -98,6 +99,7 @@
       sessionCommands = ''
         xsetroot -cursor_name left_ptr
         xset r rate 200 30
+        /home/nanda/bin/dwmstatus &
       '';
     };
 
