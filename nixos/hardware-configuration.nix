@@ -11,6 +11,7 @@
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "usbhid" "sd_mod" ];
   boot.kernelModules = [ "kvm-intel" "wl" "fbcon" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
+  boot.kernelParams = [ "acpi_osi=Darwin" "acpi_mask_gpe=0x06" ];
 
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/6b8faea8-d15c-4545-a27b-a7c111df0fb1";

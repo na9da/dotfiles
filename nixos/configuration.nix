@@ -12,16 +12,48 @@
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
+  boot.loader.timeout = 2;
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.initrd.luks.devices = [
     { name="luksroot"; device="/dev/sda2"; preLVM=true; }
   ];
 
+  boot.extraModprobeConfig = ''
+    options snd_hda_intel index=0 model=intel-mac-auto id=PCH
+    options snd_hda_intel index=1 model=intel-mac-auto id=HDMI
+    options snd-hda-intel model=mbp101
+  '';
+
   boot.cleanTmpDir = true;
 
-  networking.hostName = "mir"; # Define your hostname.
-  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  hardware = {
+    enableRedistributableFirmware = true;
+    cpu.intel.updateMicrocode = true;
+    facetimehd.enable = true;
+    opengl.enable = true;
+    opengl.driSupport32Bit = true;
+    opengl.extraPackages = with pkgs; [ vaapiIntel ];
+    pulseaudio.enable = true;
+    pulseaudio.package = pkgs.pulseaudioFull;
+    pulseaudio.systemWide = false;
+    pulseaudio.support32Bit = true;
+    pulseaudio.daemon.config = {
+      flat-volumes = "no";
+    };
+    bluetooth.enable = true;
+  };
+  sound.mediaKeys.enable = true;
+
+  networking = {
+    hostName = "mir"; # Define your hostname.
+    wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+    extraHosts = ''
+      127.0.0.1 twitter.com m.twitter.com mobile.twitter.com
+      # 127.0.0.1 news.ycombinator.com
+    '';
+    nameservers = ["1.1.1.1"];
+  };
 
   # Select internationalisation properties.
   i18n = {
@@ -34,18 +66,18 @@
   time.timeZone = "Australia/Melbourne";
 
   powerManagement.enable = true;
-  powerManagement.cpuFreqGovernor = "powersave";
-
   nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
-     wget htop
+     wget htop unzip
      dmenu st
      emacs tmux git
      firefox
      alacritty
+     pass gnupg python3
+     proselint
     
      vanilla-dmz lxappearance-gtk3 elementary-icon-theme gnome3.gnome_themes_standard
      xdg-user-dirs
@@ -54,6 +86,7 @@
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   programs.bash.enableCompletion = true;
+  programs.light.enable = true;
   # programs.mtr.enable = true;
   # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
 
@@ -63,10 +96,10 @@
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [ 8000 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = true;
 
   # Enable CUPS to print documents.
   # services.printing.enable = true;
@@ -81,13 +114,49 @@
 
   security.wrappers.slock = { source="${pkgs.slock}/bin/slock"; };
 
-  services.acpid.enable = true;  
   services.ntp.enable = true;
+  services.thermald.enable = true;
+  services.acpid.enable = true;  
+  services.mbpfan.enable = true;
+  services.ipfs.enable = true;
+  services.avahi.enable = true;
+
+  services.tlp = {
+    enable = true;
+    # My macbook throws a fit of ATA errors when the mode is set to `max_performance`
+    # or when switching between modes. So we stick to `medium_power`.
+    extraConfig = ''
+      SATA_LINKPWR_ON_AC=medium_power
+      SATA_LINKPWR_ON_BAT=medium_power
+    '';
+  };
+
+  virtualisation.docker = {
+    enable = true;
+    autoPrune.enable = true;
+  };
+  
+  services.emacs.enable = true;
+#  services.autocutsel.enable = true;
+#  services.udiskie.enable = true;
+
+  services.actkbd.enable = true;
+  services.actkbd.bindings = [
+   { keys = [ 224 ]; events = [ "key" "rep" ]; command= "${pkgs.light}/bin/light -U 4"; }
+   { keys = [ 225 ]; events = [ "key" "rep" ]; command= "${pkgs.light}/bin/light -A 4"; }
+   { keys = [ 113 ]; events = [ "key" "rep" ]; command= "${pkgs.pulseaudioFull.out}/bin/pactl set-sink-mute 0 toggle"; }
+   { keys = [ 114 ]; events = [ "key" "rep" ]; command= "${pkgs.pulseaudioFull.out}/bin/pactl set-sink-volume 0 -10%"; }   
+   { keys = [ 115 ]; events = [ "key" "rep" ]; command= "${pkgs.pulseaudioFull.out}/bin/pactl set-sink-volume 0 +10%"; }
+  ];
+  
+
   services.redshift = {
     enable = true;
-    provider = "geoclue2";
+    latitude = "37.8136"; longitude = "144.9631";
     brightness.day = "0.8";
-    brightness.night = "0.4";
+    brightness.night = "0.8";
+    temperature.day = 5500;
+    temperature.night = 5500;    
   };
 
   services.xserver = {
@@ -137,7 +206,7 @@
   users.extraUsers.nanda = {
      isNormalUser = true;
      uid = 1000;
-     extraGroups = [ "wheel" "audio" ];
+     extraGroups = [ "wheel" "audio" "docker" ];
      createHome = true;
   };
 
@@ -148,6 +217,7 @@
 
     fonts = with pkgs; [
       ubuntu_font_family
+      google-fonts
     ];
   };
 
