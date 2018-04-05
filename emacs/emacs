@@ -1,10 +1,5 @@
-(set-default-font "Ubuntu Mono-11")
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
+(set-default-font "Ubuntu Mono-11")
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -15,13 +10,10 @@
 (global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\C-c\C-k" 'kill-region)
 (global-set-key "\C-l" 'goto-line)
+(global-set-key (kbd "C-x g") 'vc-git-grep)
 (global-set-key [f1] 'help)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode 1)
  '(fill-column 79)
@@ -34,20 +26,96 @@
  '(make-backup-files nil)
  '(menu-bar-mode nil)
  '(mouse-wheel-mode t)
- '(package-selected-packages (quote (markdown-mode rust-mode yaml-mode)))
+ '(package-selected-packages
+   (quote
+    (helm-projectile helm-hoogle helm projectile shm hasky-stack ido-vertical-mode ido-ubiquitous nix-mode flycheck-rust ruby-electric flycheck-haskell flymake-ruby robe magit use-package coffee-mode intero haskell-mode company racer markdown-mode rust-mode yaml-mode)))
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil))
 
 (show-paren-mode)
 
+(require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")))
+(package-initialize)
+(eval-when-compile
+  ;; Following line is not needed if use-package.el is in ~/.emacs.d
+  (add-to-list 'load-path "<path where use-package is installed>")
+  (require 'use-package))
+
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+(add-hook 'markdown-mode-hook #'auto-fill-mode)
+
+;; Rust/Racer
+(use-package rust-mode
+  :hook ((rust-mode . (lambda ()
+                        (racer-mode)
+                        (company-mode)
+                        (eldoc-mode)
+                        ))))
+(setq company-tooltip-align-annotations t)
 
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; Haskell
+(use-package haskell-mode
+  :hook
+  ((haskell-mode . (lambda ()
+                     (intero-mode)
+                     (company-mode)
+                     (setq haskell-hoogle-command "hoogle -i"))))
+  :bind (:map haskell-mode-map
+              ("C-c i" . haskell-hoogle)
+              ("C-c h" . helm-hoogle)))
+
+(use-package shm
+  :if (executable-find "structured-haskell-mode")
+  :hook ((haskell-mode . structured-haskell-mode)
+         (structured-haskell-mode . (lambda ()
+                                      (setq haskell-indentation-mode nil))))
+  :config
+  (set-face-background 'shm-current-face "#444445")
+  (set-face-background 'shm-quarantine-face "#444420"))
+
+(use-package intero
+  :after  haskell-mode
+  :ensure t
+  :config
+  (intero-global-mode 1))
+
+(use-package hasky-stack
+  :after haskell-mode
+  :init (setq hasky-stack-auto-target t)
+  :bind (:map haskell-mode-map
+              ("C-c s i" . hasky-stack-new)
+              ("C-c s e" . hasky-stack-execute)))
+
+;; Ruby
+(use-package ruby-mode
+  :hook
+  ((ruby-mode . (lambda ()
+                  (robe-mode)
+                  (company-mode)
+                  (ruby-electric-mode)
+                  (hs-minor-mode)))))
+
+(eval-after-load "hideshow"
+  '(add-to-list 'hs-special-modes-alist
+    `(ruby-mode
+      ,(rx (or "def" "class" "module" "do" "{" "[")) ; Block start
+      ,(rx (or "}" "]" "end"))                       ; Block end
+      ,(rx (or "#" "=begin"))                        ; Comment start
+      ruby-forward-sexp nil)
+    `(haskell-mode
+      )))
+
+
+(use-package helm-projectile
+  :bind ("C-c g" . helm-projectile-grep))
+
+
+(global-set-key (kbd "C-c h") 'hs-hide-block)
+(global-set-key (kbd "C-c s") 'hs-show-block)
+
