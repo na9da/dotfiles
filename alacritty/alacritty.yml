@@ -45,7 +45,7 @@ font:
   normal:
     family: Ubuntu Mono # should be "Menlo" or something on macOS.
     # Style can be specified to pick a specific face.
-    # style: Regular
+    style: Regular
 
   # The bold font face
   bold:
@@ -60,7 +60,7 @@ font:
     # style: Italic
 
   # Point size of the font
-  size: 23.0
+  size: 24.0
 
   # Offset is the extra space around each character. offset.y can be thought of
   # as modifying the linespacing, and offset.x as modifying the letter spacing.
@@ -78,7 +78,7 @@ font:
   # OS X only: use thin stroke font rendering. Thin strokes are suitable
   # for retina displays, but for non-retina you probably want this set to
   # false.
-  use_thin_strokes: true
+  use_thin_strokes: false
 
 # Should display the render timer
 render_timer: false
@@ -160,6 +160,8 @@ colors:
    magenta: '0xa47de9'
    cyan:    '0x99faf2'
    white:   '0xffffff'
+
+
 
 
 # Visual Bell
