@@ -1,4 +1,3 @@
-
 (set-default-font "Ubuntu Mono-11")
 
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -14,6 +13,10 @@
 (global-set-key [f1] 'help)
 
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode 1)
  '(fill-column 79)
@@ -28,7 +31,7 @@
  '(mouse-wheel-mode t)
  '(package-selected-packages
    (quote
-    (helm-projectile helm-hoogle helm projectile shm hasky-stack ido-vertical-mode ido-ubiquitous nix-mode flycheck-rust ruby-electric flycheck-haskell flymake-ruby robe magit use-package coffee-mode intero haskell-mode company racer markdown-mode rust-mode yaml-mode)))
+    (purescript-mode psc-ide tuareg merlin reason-mode helm-projectile helm-hoogle helm projectile shm hasky-stack ido-vertical-mode ido-ubiquitous nix-mode flycheck-rust ruby-electric flycheck-haskell flymake-ruby robe magit use-package coffee-mode intero haskell-mode company racer markdown-mode rust-mode yaml-mode)))
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil))
 
@@ -45,8 +48,9 @@
   (add-to-list 'load-path "<path where use-package is installed>")
   (require 'use-package))
 
-(add-hook 'after-init-hook #'global-flycheck-mode)
+(add-to-list 'load-path "~/code/dotfiles/emacs")
 
+(add-hook 'after-init-hook #'global-flycheck-mode)
 (add-hook 'markdown-mode-hook #'auto-fill-mode)
 
 ;; Rust/Racer
@@ -70,15 +74,6 @@
               ("C-c i" . haskell-hoogle)
               ("C-c h" . helm-hoogle)))
 
-(use-package shm
-  :if (executable-find "structured-haskell-mode")
-  :hook ((haskell-mode . structured-haskell-mode)
-         (structured-haskell-mode . (lambda ()
-                                      (setq haskell-indentation-mode nil))))
-  :config
-  (set-face-background 'shm-current-face "#444445")
-  (set-face-background 'shm-quarantine-face "#444420"))
-
 (use-package intero
   :after  haskell-mode
   :ensure t
@@ -101,21 +96,12 @@
                   (ruby-electric-mode)
                   (hs-minor-mode)))))
 
-(eval-after-load "hideshow"
-  '(add-to-list 'hs-special-modes-alist
-    `(ruby-mode
-      ,(rx (or "def" "class" "module" "do" "{" "[")) ; Block start
-      ,(rx (or "}" "]" "end"))                       ; Block end
-      ,(rx (or "#" "=begin"))                        ; Comment start
-      ruby-forward-sexp nil)
-    `(haskell-mode
-      )))
-
-
-(use-package helm-projectile
-  :bind ("C-c g" . helm-projectile-grep))
-
-
-(global-set-key (kbd "C-c h") 'hs-hide-block)
-(global-set-key (kbd "C-c s") 'hs-show-block)
+(use-package psc-ide
+  :config (add-to-list 'psc-ide-source-globs ".psc-package/*/*/*/src/**/*.purs")
+  :hook 
+  ((purescript-mode . (lambda () 
+                        (psc-ide-mode)
+                        (company-mode)
+                        (flycheck-mode)
+                        (turn-on-purescript-indentation)))))
 
