@@ -50,7 +50,7 @@
     wireless.enable = true;  # Enables wireless support via wpa_supplicant.
     extraHosts = ''
       127.0.0.1 twitter.com m.twitter.com mobile.twitter.com
-      # 127.0.0.1 news.ycombinator.com
+      127.0.0.1 news.ycombinator.com
     '';
     nameservers = ["1.1.1.1"];
   };
@@ -74,7 +74,7 @@
      wget htop unzip
      dmenu st
      emacs tmux git
-     firefox
+     firefox browserpass
      alacritty
      pass gnupg python3
      proselint
@@ -83,6 +83,11 @@
      xdg-user-dirs
   ];
 
+  environment.variables = {
+    NIX_REMOTE = "daemon";
+    EDITOR = "nano";
+  };
+  
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   programs.bash.enableCompletion = true;
@@ -118,7 +123,6 @@
   services.thermald.enable = true;
   services.acpid.enable = true;  
   services.mbpfan.enable = true;
-  services.ipfs.enable = true;
   services.avahi.enable = true;
 
   services.tlp = {
@@ -131,15 +135,7 @@
     '';
   };
 
-  virtualisation.docker = {
-    enable = true;
-    autoPrune.enable = true;
-  };
-  
   services.emacs.enable = true;
-#  services.autocutsel.enable = true;
-#  services.udiskie.enable = true;
-
   services.actkbd.enable = true;
   services.actkbd.bindings = [
    { keys = [ 224 ]; events = [ "key" "rep" ]; command= "${pkgs.light}/bin/light -U 4"; }
@@ -167,7 +163,7 @@
       lightdm.enable = true;
       sessionCommands = ''
         xsetroot -cursor_name left_ptr
-        xset r rate 200 30
+#        xset r rate 100 30
         /home/nanda/bin/dwmstatus &
       '';
     };
@@ -225,6 +221,6 @@
   # compatible, in order to avoid breaking some software such as database
   # servers. You should change this only after NixOS release notes say you
   # should.
-  system.stateVersion = "17.09"; # Did you read the comment?
+  system.stateVersion = "18.03"; # Did you read the comment?
 
 }
