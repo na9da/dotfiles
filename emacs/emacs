@@ -2,7 +2,6 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-h" 'backward-delete-char)
@@ -19,6 +18,9 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode 1)
+ '(custom-safe-themes
+   (quote
+    ("bf390ecb203806cbe351b966a88fc3036f3ff68cd2547db6ee3676e87327b311" default)))
  '(fill-column 79)
  '(ido-everywhere t)
  '(ido-max-prospects 8)
@@ -29,13 +31,20 @@
  '(make-backup-files nil)
  '(menu-bar-mode nil)
  '(mouse-wheel-mode t)
+ '(org-agenda-files (quote ("~/notes/2019.org")))
  '(package-selected-packages
    (quote
-    (purescript-mode psc-ide tuareg merlin reason-mode helm-projectile helm-hoogle helm projectile shm hasky-stack ido-vertical-mode ido-ubiquitous nix-mode flycheck-rust ruby-electric flycheck-haskell flymake-ruby robe magit use-package coffee-mode intero haskell-mode company racer markdown-mode rust-mode yaml-mode)))
+    (dracula-theme nord-theme color-theme elfeed-goodies centered-window-mode elfeed-org elfeed-web prettier-js rufo rufo-mode hindent company-ghc lsp-haskell lsp-ui company-lsp lsp-mode company-mode eglot web-mode tide typescript-mode purescript-mode psc-ide tuareg merlin reason-mode helm-projectile helm-hoogle helm projectile shm hasky-stack ido-vertical-mode ido-ubiquitous nix-mode flycheck-rust ruby-electric flycheck-haskell flymake-ruby robe magit use-package coffee-mode intero haskell-mode company racer markdown-mode rust-mode yaml-mode)))
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil))
 
 (show-paren-mode)
+
+
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -53,26 +62,56 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (add-hook 'markdown-mode-hook #'auto-fill-mode)
 
+(use-package color-theme
+  :ensure t)
+(use-package monokai-theme
+  :ensure t
+  :init (load-theme 'monokai t))
+
 ;; Rust/Racer
 (use-package rust-mode
   :hook ((rust-mode . (lambda ()
                         (racer-mode)
                         (company-mode)
-                        (eldoc-mode)
-                        ))))
+                        (company-lsp)
+                        (eldoc-mode)))))
 (setq company-tooltip-align-annotations t)
 
+(use-package company-lsp
+  :config
+  (push 'company-lsp company-backends))
 
 ;; Haskell
 (use-package haskell-mode
   :hook
   ((haskell-mode . (lambda ()
+                     ;; (lsp-ui-mode)
+                     ;; (lsp-haskell-enable)
                      (intero-mode)
                      (company-mode)
-                     (setq haskell-hoogle-command "hoogle -i"))))
+                     (eldoc-mode t)
+                     (flycheck-mode)
+                     (hindent-mode)
+                     ;; (setq haskell-stylish-on-save t)
+                     (setq haskell-hoogle-command "hoogle -i")))
+   (before-save . haskell-format-imports)
+   (before-save . hindent-reformat-buffer))
   :bind (:map haskell-mode-map
               ("C-c i" . haskell-hoogle)
-              ("C-c h" . helm-hoogle)))
+              ("C-c h" . helm-hoogle)
+              ("C-c r" . intero-restart)))
+
+(use-package hindent
+  :ensure t)
+
+(use-package flycheck-haskell
+  :ensure t
+  :hook ((flycheck-mode . flycheck-haskell-setup)))
+
+(use-package lsp-ui
+  :ensure t)
+(use-package lsp-haskell
+  :ensure t)
 
 (use-package intero
   :after  haskell-mode
@@ -80,12 +119,21 @@
   :config
   (intero-global-mode 1))
 
-(use-package hasky-stack
-  :after haskell-mode
-  :init (setq hasky-stack-auto-target t)
-  :bind (:map haskell-mode-map
-              ("C-c s i" . hasky-stack-new)
-              ("C-c s e" . hasky-stack-execute)))
+;; Javascript
+(use-package prettier-js
+  :ensure t
+  :hook ((js-mode . prettier-js-mode))
+  :config
+  (setq js-indent-level 2)
+  (add-hook 'web-mode-hook
+            #'(lambda ()
+                (enable-minor-mode '("\\.jsx?\\'" . prettier-js-mode)))))
+
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+      (funcall (cdr my-pair)))))
 
 ;; Ruby
 (use-package ruby-mode
@@ -94,7 +142,12 @@
                   (robe-mode)
                   (company-mode)
                   (ruby-electric-mode)
-                  (hs-minor-mode)))))
+                  (hs-minor-mode)
+                  (rufo-minor-mode)))))
+
+(use-package rufo
+  :ensure t
+  :config (setq rufo-enable-format-on-save t))
 
 (use-package psc-ide
   :config (add-to-list 'psc-ide-source-globs ".psc-package/*/*/*/src/**/*.purs")
@@ -105,3 +158,74 @@
                         (flycheck-mode)
                         (turn-on-purescript-indentation)))))
 
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package company
+  :ensure t
+  :init (global-company-mode))
+
+;; (use-package company
+;;   :ensure t)
+
+;; (use-package typescript-mode
+;;   :ensure t)
+
+(use-package tide
+  :ensure t
+  :after typescript-mode
+  :config
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  (add-hook 'before-save-hook 'tide-format-before-save))
+
+(use-package web-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode)))))
+
+(use-package elfeed
+  :ensure t
+  :hook ((elfeed-show-mode . (lambda ()
+                               (set-face-attribute 'variable-pitch (selected-frame)
+                                                   :font "Ubuntu Mono-11")
+                               (visual-line-mode)))))
+(use-package elfeed-org
+  :ensure t
+  :config
+  (elfeed-goodies/setup)
+  (elfeed-org)
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+(use-package elfeed-goodies
+  :ensure t)
+
+(use-package eww
+  :ensure t
+  :hook ((eww-mode . visual-line)))
+
+;; enable typescript-tslint checker
+(flycheck-add-mode 'typescript-tslint 'web-mode)
+
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1))
+
+ (add-hook 'eshell-preoutput-filter-functions
+           'ansi-color-filter-apply)
+
+
+(use-package org
+  :config
+  (setq org-log-done 'time))
