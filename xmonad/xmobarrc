@@ -1,0 +1,47 @@
+
+Config {
+  font = "xft:Inconsolata\-g for Powerline:style=Regular:size=10:antialias=true",
+  additionalFonts =
+  [ "xft:Font Awesome 5 Free Solid:size=9:antialias=true"
+  ]
+  , position = Static { xpos = 0, ypos = 0, width = 2560, height = 42 }
+  , alpha = 0
+  , lowerOnStart = True
+  , allDesktops = True
+  , border = NoBorder
+  , fgColor = "#dedede"
+  , commands =
+      [ Run Date "<fn=1>\xf017</fn> %a %H:%M" "date" 10
+      , Run BatteryP ["BAT0"] [
+          "-t", "<acstatus>", "--"
+          , "-O", "<fn=1>\xf240</fn> <left>%"
+          , "-i", "<fn=1>\xf240</fn> <left>%"
+          , "-o", "<fn=1>\xf240</fn> <left>%"
+          ] 10
+
+      , Run Wireless "wlp3s0" [
+          "-a", "l"
+          , "-t", "<fn=1>\xf1eb</fn> <essid>"
+          , "-L", "50"
+          , "-H", "75"
+          , "-l", "red"
+          , "-n", "yellow"
+          ] 10
+
+      , Run Weather "YMML" ["-t", "<fn=1>\xf2c8</fn> <tempC>°C <skyCondition>"] 36000
+      , Run Volume "default" "Master" [ "--template", "<status><volume>"
+                                        , "--ppad", "3"
+                                        , "--suffix", "True"
+                                        , "--"
+                                        , "--on", "<fn=1>\xf028</fn>"
+                                        , "--off", "<fn=1>\xf6a9</fn>"
+                                        , "--onc", "#dedede"
+                                        , "--offc", "#dedede"
+                                        ] 10
+      , Run StdinReader
+    ]
+
+  , sepChar = "%"
+  , alignSep = "}{"
+  , template = "%StdinReader% }{ <action=`firefox --new-window https://windy.com`>%YMML%</action> | <action=`wpa_gui`>%wlp3s0wi%</action> | %battery% | %default:Master% | <action=`alacritty -e sh -c 'cal -3; bash'`>%date%</action> "
+  }
